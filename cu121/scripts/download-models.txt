@@ -45,3 +45,9 @@ https://huggingface.co/datasets/gsdf/EasyNegative/resolve/main/EasyNegative.safe
 https://huggingface.co/lenML/DeepNegative/resolve/main/NG_DeepNegative_V1_75T.pt
   dir=embeddings
   out=ng_deepnegative_v1_75t.pt
+
+
+# cft-models
+https://huggingface.co/Kijai/flux-fp8/resolve/main/flux1-dev-fp8.safetensors
+https://huggingface.co/alimama-creative/FLUX.1-Turbo-Alpha/resolve/main/diffusion_pytorch_model.safetensors
+https://civitai.com/models/792432/dollcute
