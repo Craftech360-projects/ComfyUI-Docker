@@ -12,7 +12,8 @@ RUN set -eu
 
 RUN --mount=type=cache,target=/var/cache/zypp \
     zypper --gpg-auto-import-keys \
-        dist-upgrade --no-confirm --no-recommends --auto-agree-with-licenses
+        dist-upgrade --no-confirm --no-recommends --auto-agree-with-licenses \
+    && rm /usr/lib64/python3.12/EXTERNALLY-MANAGED
 
 ################################################################################
 # Extra Packages
@@ -48,7 +49,13 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip install \
         -r /builder-scripts/pak9.txt \
     && pip install \
-        -r /builder-scripts/pakA.txt \
+        -r /builder-scripts/pakA.txt
+
+# Make sure the deps fit the needs for ComfyUI & Manager
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+        -r https://github.com/comfyanonymous/ComfyUI/raw/refs/heads/master/requirements.txt \
+        -r https://github.com/ltdrdata/ComfyUI-Manager/raw/refs/heads/main/requirements.txt \
     && pip list
 
 ################################################################################

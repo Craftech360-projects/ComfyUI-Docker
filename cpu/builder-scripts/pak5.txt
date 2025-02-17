@@ -13,7 +13,6 @@ fvcore
 GitPython
 imageio-ffmpeg
 importlib-metadata
-matrix-client==0.4.0
 mediapipe
 mss
 numba
@@ -24,7 +23,6 @@ pixeloe
 psutil
 py-cpuinfo
 PyGithub
-pynvml
 python-dateutil
 pyyaml
 qrcode[pil]

@@ -25,7 +25,7 @@ docker run -it --rm \
 
 ## Image tags
 
-* link:cu121/README.adoc[`cu121`, `latest`]
+* link:cu121/README.adoc[`cu121`]
 
 ** Easy for ComfyUI beginners. Starts with ComfyUI, ComfyUI-Manager and the Photon (SD1.5) model.
 ** Using a low-privilege user within the container (easy for WSL2 deploy).
@@ -39,7 +39,7 @@ docker run -it --rm \
 ** Using 'root' user within the container (easy for rootless deploy).
 ** Using CUDA 12.4 + Python 3.12.
 
-* link:cu121-megapak/README.adoc[`cu121-megapak`, `megapak`]
+* link:cu121-megapak/README.adoc[`cu121-megapak`]
 
 ** All-in-one bundle, including dev kits.
 ** Using CUDA 12.1 + Python 3.11.

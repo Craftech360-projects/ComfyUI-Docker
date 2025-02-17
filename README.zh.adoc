@@ -17,7 +17,7 @@ https://hub.docker.com/r/yanwk/comfyui-boot[Docker 镜像]
 ** 额外提供 `Dockerfile-cn` 以便本地构建
 ** 推荐初次尝试 ComfyUI 的国内用户使用
 
-* link:cu121/README.zh.adoc[`cu121`, `latest`]
+* link:cu121/README.zh.adoc[`cu121`]
 
 ** 经典版本，简洁易上手，但需要良好的网络连接
 ** 默认仅安装基本的 ComfyUI 与 Manager
@@ -26,7 +26,7 @@ https://hub.docker.com/r/yanwk/comfyui-boot[Docker 镜像]
 ** 不推荐 Podman 与 rootless 用户使用（改用本仓库内其他镜像均可）
 ** 使用 CUDA 12.1 与 Python 3.11
 
-* link:cu121-megapak/README.zh.adoc[`cu121-megapak`, `megapak`]
+* link:cu121-megapak/README.zh.adoc[`cu121-megapak`]
 
 ** 大型整合包，包含开发组件
 ** 容器内使用 root 用户运行（便于 rootless 部署）

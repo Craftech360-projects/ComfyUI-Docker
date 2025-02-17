@@ -26,7 +26,7 @@ Once the app is loaded, visit http://localhost:8188/
 
 ## Image Tags
 
-- `cu121`, `latest` [\[doc\]](https://github.com/YanWenKun/ComfyUI-Docker/tree/main/cu121)
+- `cu121` [\[doc\]](https://github.com/YanWenKun/ComfyUI-Docker/tree/main/cu121)
 
   - Easy for ComfyUI beginners.
   - Starts with ComfyUI, ComfyUI-Manager and the Photon (SD1.5) model.
@@ -40,7 +40,7 @@ Once the app is loaded, visit http://localhost:8188/
   - Using 'root' user within the container (easy for rootless deploy).
   - Using CUDA 12.4 + Python 3.12.
 
-- `cu121-megapak`, `megapak` [\[doc\]](https://github.com/YanWenKun/ComfyUI-Docker/tree/main/cu121-megapak)
+- `cu121-megapak` [\[doc\]](https://github.com/YanWenKun/ComfyUI-Docker/tree/main/cu121-megapak)
 
   - All-in-one bundle, including dev kits.
   - Using 'root' user within the container (easy for rootless deploy).

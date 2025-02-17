@@ -1,10 +1,8 @@
 ################################################################################
-# 用于构建镜像 'yanwk/comfyui-boot:cu124-cn' 的 Dockerfile
-# 为适应国内网络环境，运行时的下载地址均改用国内源。
-# 但需注意，构建本镜像时仍需要流畅的网络环境（完全走国内源请参考另一 Dockerfile）。
-#
-# 使用 CUDA 12.4, Python 3.12, GCC 13
-# 容器内将以 root 用户运行，以便于 rootless 部署
+# Dockerfile that builds 'yanwk/comfyui-boot:cpu'
+# A runtime environment for https://github.com/comfyanonymous/ComfyUI
+# Using CPU only (not using GPU).
+# The container will be running in root (easy for rootless deploy).
 ################################################################################
 
 FROM docker.io/opensuse/tumbleweed:latest
@@ -14,8 +12,8 @@ LABEL maintainer="YAN Wenkun <code@yanwk.fun>"
 RUN set -eu
 
 ################################################################################
-# Python 及工具
-# 利用 openSUSE 软件仓库的 PIP 包，以确保兼容性以及更多的系统级支持。后续仍可使用 PIP 更新。
+# Python and tools
+# Since this image is so big, we use openSUSE-verified PIP packages for compatibility.
 
 RUN --mount=type=cache,target=/var/cache/zypp \
     zypper addrepo --check --refresh --priority 90 \
@@ -67,6 +65,7 @@ aria2 \
 fish \
 fd \
 vim \
+which \
 opencv \
 opencv-devel \
 ffmpeg \
@@ -78,7 +77,7 @@ google-noto-coloremoji-fonts
 
 ################################################################################
 # GCC 13 
-# 与 CUDA 12.4 兼容
+# Align with CUDA 12.6.
 
 RUN --mount=type=cache,target=/var/cache/zypp \
     zypper --gpg-auto-import-keys \
@@ -99,51 +98,37 @@ cpp13 \
     && update-alternatives --install /usr/bin/gcov-tool gcov-tool /usr/bin/gcov-tool-13 90 
 
 ################################################################################
-# Python 包
+# Python Packages
 
-# PyTorch, xFormers
-# 拆分安装步骤，使生成的镜像文件分为更多更小的层，减少单层下载大小。
+# PyTorch
+# Break down the steps, so we have more but smaller image layers.
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip list \
     && pip install \
         --upgrade pip wheel setuptools \
     && pip install \
-        --dry-run xformers torchvision torchaudio \
-        --index-url https://download.pytorch.org/whl/cu124 \
+        --dry-run torch torchvision torchaudio \
+        --index-url https://download.pytorch.org/whl/cpu \
         --extra-index-url https://pypi.org/simple
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
-        --no-deps xformers torch torchvision torchaudio \
-        --index-url https://download.pytorch.org/whl/cu124 \
+        --no-deps torch torchvision torchaudio \
+        --index-url https://download.pytorch.org/whl/cpu \
         --extra-index-url https://pypi.org/simple
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
-        xformers torchvision torchaudio \
-        --index-url https://download.pytorch.org/whl/cu124 \
+        torch torchvision torchaudio \
+        --index-url https://download.pytorch.org/whl/cpu \
         --extra-index-url https://pypi.org/simple
 
-# 绑定环境变量 (依赖库 .so 文件)
-ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}\
-:/usr/local/lib64/python3.12/site-packages/torch/lib\
-:/usr/local/lib/python3.12/site-packages/cusparselt/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/cuda_cupti/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/cuda_runtime/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/cudnn/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/cufft/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/cublas/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/cuda_nvrtc/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/curand/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/cusolver/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/cusparse/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/nccl/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/nvjitlink/lib\
-:/usr/local/lib/python3.12/site-packages/nvidia/nvtx/lib"
+# Bind libs (.so files)
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib64/python3.12/site-packages/torch/lib"
 
+# Deps for ComfyUI & custom nodes
 COPY builder-scripts/.  /builder-scripts/
 
-# 安装 ComfyUI 及扩展的依赖项
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
         -r /builder-scripts/pak3.txt
@@ -156,29 +141,12 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
         -r /builder-scripts/pak7.txt
 
-# 确保依赖项匹配 ComfyUI & Manager
+# Make sure the deps fit the needs for ComfyUI & Manager
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
         -r https://github.com/comfyanonymous/ComfyUI/raw/refs/heads/master/requirements.txt \
         -r https://github.com/ltdrdata/ComfyUI-Manager/raw/refs/heads/main/requirements.txt \
     && pip list
-
-################################################################################
-
-# 使用国内下载源
-
-RUN --mount=type=cache,target=/var/cache/zypp \
-    zypper modifyrepo --disable --all \
-    && zypper addrepo --check --refresh --gpgcheck \
-        'https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/oss/' mirror-oss \
-    && zypper addrepo --check --refresh --gpgcheck \
-        'https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/non-oss/' mirror-non-oss \
-    && zypper addrepo --check --refresh --priority 90 \
-        'https://mirrors.tuna.tsinghua.edu.cn/packman/suse/openSUSE_Tumbleweed/Essentials/' mirror-packman-essentials
-
-ENV PIP_INDEX_URL="https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
-        
-ENV HF_ENDPOINT="https://hf-mirror.com"
 
 ################################################################################
 
@@ -191,5 +159,5 @@ USER root
 VOLUME /root
 WORKDIR /root
 EXPOSE 8188
-ENV CLI_ARGS=""
+ENV CLI_ARGS="--cpu"
 CMD ["bash","/runner-scripts/entrypoint.sh"]

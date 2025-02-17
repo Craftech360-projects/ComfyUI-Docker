@@ -161,15 +161,19 @@ ARG PIP_EXTRA_INDEX_URL="https://pypi.org/simple"
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
-        --dry-run xformers torchvision torchaudio
+        --dry-run xformers==0.0.29.post1 torch==2.5.1 torchvision torchaudio
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
-        --no-deps xformers torch torchvision torchaudio
+        --no-deps torch==2.5.1
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
-        xformers torchvision torchaudio
+        --no-deps xformers==0.0.29.post1 torch==2.5.1
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+        xformers==0.0.29.post1 torch==2.5.1 torchvision torchaudio
 
 ARG PIP_INDEX_URL=
 ARG PIP_EXTRA_INDEX_URL=
@@ -179,6 +183,7 @@ ARG PIP_EXTRA_INDEX_URL=
 # What's more, NVIDIA's openSUSE15 repo didn't provide CuDNN & NCCL, we have to use Python packages anyway.
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}\
 :/usr/local/lib64/python3.11/site-packages/torch/lib\
+:/usr/local/lib/python3.11/site-packages/cusparselt/lib\
 :/usr/local/lib/python3.11/site-packages/nvidia/cuda_cupti/lib\
 :/usr/local/lib/python3.11/site-packages/nvidia/cuda_runtime/lib\
 :/usr/local/lib/python3.11/site-packages/nvidia/cudnn/lib\
